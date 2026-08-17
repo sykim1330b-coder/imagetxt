@@ -29,8 +29,16 @@ LOW_CONFIDENCE = 60.0
 
 # Tesseract는 300dpi 정도의 큰 글자에서 정확도가 가장 좋다. 작은 이미지는
 # 확대해서 넘기고, 원래 큰 이미지는 그대로 둔다.
-_TARGET_WIDTH = 1200
-_MAX_SCALE = 3.0
+#
+# 화면을 찍은 사진처럼 글자가 작고 뭉개진 이미지에서는 확대 폭이 정확도를
+# 좌우한다. 실측에서 560px 이미지를 1200px로 늘렸을 때보다 2400px로
+# 늘렸을 때 인식한 단어가 눈에 띄게 늘었다(5개 → 7개).
+_TARGET_WIDTH = 2400
+_MAX_SCALE = 6.0
+
+# 세로로 긴 이미지는 배율만 제한해서는 메모리를 다 먹을 수 있어(예: 400x9000을
+# 6배로 늘리면 1억 3천만 픽셀) 확대 결과의 총 픽셀 수도 함께 제한한다.
+_MAX_PIXELS = 40_000_000
 
 
 @dataclass
@@ -121,9 +129,13 @@ def _prepare(image, enhance: bool):
     width, height = prepared.size
     if width > 0 and width < _TARGET_WIDTH:
         scale = min(_TARGET_WIDTH / width, _MAX_SCALE)
-        prepared = prepared.resize(
-            (round(width * scale), round(height * scale)), Image.LANCZOS
-        )
+        pixels = width * height
+        if pixels * scale**2 > _MAX_PIXELS:
+            scale = max(1.0, (_MAX_PIXELS / pixels) ** 0.5)
+        if scale > 1.0:
+            prepared = prepared.resize(
+                (round(width * scale), round(height * scale)), Image.LANCZOS
+            )
     return prepared
 
 

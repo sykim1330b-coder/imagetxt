@@ -96,6 +96,28 @@ def test_prepare_upscales_small_images_and_flattens_transparency():
     assert prepared_raw.size == (200, 60)
 
 
+def test_prepare_upscales_toward_target_width():
+    prepared = ocr._prepare(Image.new("L", (600, 200), "white"), enhance=True)
+
+    assert prepared.size[0] == ocr._TARGET_WIDTH
+
+
+def test_prepare_does_not_shrink_large_images():
+    large = Image.new("L", (ocr._TARGET_WIDTH + 500, 400), "white")
+
+    assert ocr._prepare(large, enhance=True).size == large.size
+
+
+def test_prepare_caps_total_pixels_on_tall_images():
+    """세로로 긴 이미지를 배율대로 늘리면 메모리를 다 먹는다."""
+    tall = Image.new("L", (400, 9000), "white")
+
+    prepared = ocr._prepare(tall, enhance=True)
+
+    assert prepared.size[0] * prepared.size[1] <= ocr._MAX_PIXELS
+    assert prepared.size[0] > 400  # 그래도 확대는 된다
+
+
 def make_text_image(path, lines):
     # 줄 간격을 글자 크기에 맞춰 좁게 둔다. 너무 벌리면 Tesseract가 줄마다
     # 다른 문단으로 인식해서 "문단으로 합치기"가 동작하지 않는다.
