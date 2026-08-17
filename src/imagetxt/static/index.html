@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>imagetxt — 이미지에서 영어 텍스트 뽑기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>이미지 → 영어 텍스트</h1>
+    <p class="subtitle">이미지 속 영어 텍스트를 번역이나 요약 없이 보이는 그대로 옮겨 적습니다.</p>
+
+    <section id="upload-section">
+      <div id="dropzone" tabindex="0">
+        <p><strong>이미지를 끌어다 놓거나 클릭해서 선택</strong></p>
+        <p class="hint">png, jpg, webp 등 · 최대 20MB · 붙여넣기(Ctrl+V)도 됩니다</p>
+        <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff,.gif" hidden>
+      </div>
+      <p id="selected-file" class="hidden"></p>
+      <img id="thumbnail" class="hidden" alt="선택한 이미지 미리보기">
+
+      <div class="options">
+        <label>
+          인식 모드
+          <select id="page-mode">
+            <option value="auto" selected>문서 (자동)</option>
+            <option value="block">텍스트 한 덩어리</option>
+            <option value="line">한 줄</option>
+            <option value="sparse">흩어진 텍스트</option>
+          </select>
+        </label>
+        <label>
+          줄바꿈
+          <select id="layout">
+            <option value="lines" selected>보이는 그대로</option>
+            <option value="paragraph">문단으로 합치기</option>
+          </select>
+        </label>
+        <fieldset>
+          <legend>이미지 처리</legend>
+          <label class="check"><input type="checkbox" id="enhance" checked> 자동 보정 (대비·확대)</label>
+        </fieldset>
+      </div>
+
+      <button id="start-btn" disabled>텍스트 읽기</button>
+    </section>
+
+    <section id="progress-section" class="hidden">
+      <h2>읽는 중…</h2>
+      <p class="hint">이미지 크기에 따라 몇 초 정도 걸립니다.</p>
+    </section>
+
+    <section id="result-section" class="hidden">
+      <h2>완료</h2>
+      <p id="result-info"></p>
+      <p id="quality-warning" class="warning hidden"></p>
+      <div id="download-buttons">
+        <a id="download-txt" href="#" download>TXT 다운로드</a>
+        <button id="copy-btn" type="button">텍스트 복사</button>
+      </div>
+      <h3>인식된 텍스트</h3>
+      <pre id="preview"></pre>
+      <button id="reset-btn">다른 이미지 읽기</button>
+    </section>
+
+    <section id="error-section" class="hidden">
+      <h2>오류</h2>
+      <p id="error-message"></p>
+      <button id="error-reset-btn">다시 시도</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
